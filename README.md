@@ -2,7 +2,7 @@
 
 dokku-redirect is a plugin for [dokku][dokku] that gives the ability to set simple redirects for an application.
 
-This plugin only redirects one domain to another and does not handle complete URLs. If source domain is managed by dokku and is TLS enabled, then nginx configuration for https redirects will be handled automatically.
+This plugin only redirects between domains. It does not inspect or modify the remainder of the URL. For TLS-enabled domains managed by dokku, this plugin automatically sets up redirects for both http and https connections.
 
 ## Installation
 
@@ -14,35 +14,45 @@ $ dokku plugin:install https://github.com/dokku/dokku-redirect.git
 ## Commands
 
 ```
-$ dokku help
-    redirect <app>                            Display the redirects set on app
-    redirect:set <app> <source> <destination> Set a redirect from <source> domain to <destination> domain
-    redirect:unset <app> <source>             Unset a redirect from <source>
+$ dokku redirect:help
+    redirect:add <app> <src> <dst> [<code>]    Add a redirect from <src> domain to <dst> domain, with optional HTTP code
+    redirect:remove <app> <src>                Remove a redirect from <src> domain
+    redirect:remove-all <app>                  Remove all redirects from an app
+    redirect:report [<app>]                    Display a report on redirects, optionally limited to a single app
 ```
 
-## Usage
+## Redirect Codes
+
+| Code | Name               | Behavior                                           |
+| ---- | ------------------ | -------------------------------------------------- |
+| 301  | Moved Permanently  | __(Default)__ Permanent, preserves method          |
+| 302  | Found              | Temporary, may change method to GET                |
+| 303  | See Other          | (HTTP/1.1) Temporary, changes method to GET        |
+| 307  | Temporary Redirect | (HTTP/1.1) Temporary, preserves method             |
+
+## Examples
 
 Check redirects on my-app
 ```shell
-$ dokku redirect my-app
+$ dokku redirect:report my-app
 
-SOURCE       DESTINATION
-ma.dokku.me  my-app.dokku.me
+SOURCE       DESTINATION      CODE
+ma.dokku.me  my-app.dokku.me  301
 ```
 
-Set a new redirect on my-app
+Add a new redirect on my-app
 ```shell
-$ dokku redirect:set my-app ma.dokku.me my-app.dokku.me
+$ dokku redirect:add my-app ma.dokku.me my-app.dokku.me
 
------> Setting redirect for my-app...
+-----> Adding redirect for my-app...
        done
 ```
 
-Unset an existing redirect
+Remove an existing redirect
 ```shell
-$ dokku redirect:unset my-app ma.dokku.me
+$ dokku redirect:remove my-app ma.dokku.me
 
------> Unsetting redirect for my-app...
+-----> Removing redirect for my-app...
        done
 ```
 
