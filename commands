@@ -17,7 +17,7 @@ if [[ $1 == redirect || $1 == redirect:* ]]; then
 fi
 
 case "$1" in
-  redirect:set)
+  redirect:add|redirect:set)
     [[ -z $3 || -z $4 ]] && echo "Please provide a source domain and a destination" && exit 1
     SOURCE="$3"; DEST="$4"
     touch "$REDIRECT_FILE"
@@ -28,7 +28,7 @@ case "$1" in
     dokku_log_verbose "done"
     ;;
 
-  redirect:unset)
+  redirect:remove|redirect:unset)
     [[ -z $3 ]] && echo "Please provide a source domain" && exit 1
     DOMAIN="$3"
     dokku_log_info1 "Unsetting redirect for $APP..."
@@ -46,8 +46,8 @@ case "$1" in
   help)
     HELP=$(cat<<EOF
     redirect <app>, Display the redirects set on app
-    redirect:set <app> <source> <destination>, Set a redirect from <source> domain to <destination> domain
-    redirect:unset <app> <source>, Unset a redirect from <source>
+    redirect:add <app> <source> <destination>, Set a redirect from <source> domain to <destination> domain
+    redirect:remove <app> <source>, Unset a redirect from <source>
 EOF
 )
     if [[ -n $DOKKU_API_VERSION ]]; then
