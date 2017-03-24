@@ -5,6 +5,8 @@ PLUGIN_BASE_PATH="$PLUGIN_PATH"
 if [[ -n $DOKKU_API_VERSION ]]; then
   PLUGIN_BASE_PATH="$PLUGIN_ENABLED_PATH"
 fi
+
+# shellcheck source=../dokku/plugins/common/functions
 source "$PLUGIN_BASE_PATH/common/functions"
 
 if [[ $1 == redirect || $1 == redirect:* ]]; then
@@ -56,7 +58,7 @@ EOF
     ;;
 
   *)
-    exit $DOKKU_NOT_IMPLEMENTED_EXIT
+    exit "$DOKKU_NOT_IMPLEMENTED_EXIT"
     ;;
 
 esac
