@@ -38,6 +38,13 @@ case "$1" in
     dokku_log_verbose "done"
     ;;
 
+  redirect:remove-all)
+    dokku_log_info1 "Removing all redirects for $APP..."
+    rm "$REDIRECT_FILE"
+    is_deployed "$APP" && dokku nginx:build-config "$APP"
+    dokku_log_verbose "done"
+    ;;
+
   redirect:report)
     [[ ! -s $REDIRECT_FILE ]] && dokku_log_warn "There are no redirects for $APP" && exit 0
     (echo "SOURCE:DESTINATION:CODE"; awk -F ':' 'BEGIN { OFS=":" } { if ($3=="") {$3="301"}; print }' "$DOKKU_ROOT/$APP/REDIRECTS") | column -s: -t
@@ -45,8 +52,9 @@ case "$1" in
 
   help)
     HELP=$(cat<<EOF
-    redirect:add <app> <source> <destination> [<code>], Set a redirect from <source> domain to <destination> domain
-    redirect:remove <app> <source>, Unset a redirect from <source>
+    redirect:add <app> <source> <destination> [<code>], Add a redirect from <source> domain to <destination> domain
+    redirect:remove <app> <source>, Remove a redirect from <source>
+    redirect:remove-all <app>, Remove all redirects from <source>
     redirect:report <app>, Display the redirects set on app
 EOF
 )
